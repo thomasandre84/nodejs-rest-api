@@ -13,7 +13,7 @@ app.use(
     extended: true,
   })
 );
-app.use(cors);
+//app.use(cors);
 app.use(
   fileUpload({
     debug: true,
@@ -31,23 +31,27 @@ app.get("/", (request, response) => {
 app.get("/quotes", db.getQuotes);
 app.get("/quotes/random", db.getRandomQuote);
 
-app.post("/quotes/upload", (req, res) => {
-  const image = req.files.myFile;
-  const path = __dirname + "/tmp" + image.name;
+app.post("/quotes/upload", function (req, res) {
+  let sampleFile;
+  let uploadPath;
 
-  image.mv(path, (error) => {
-    if (error) {
-      console.error(error);
-      res.writeHead(500, {
-        "Content-Type": "application/json",
-      });
-      res.end(JSON.stringify({ status: "error", message: error }));
-      return;
+  console.log(req.files);
+  if (!req.files || Object.keys(req.files).length === 0) {
+    res.status(400).send("No files were uploaded.");
+    return;
+  }
+
+  console.log("req.files >>>", req.files); // eslint-disable-line
+
+  sampleFile = req.files.sampleFile;
+
+  uploadPath = __dirname + "/uploads/" + sampleFile.name;
+
+  sampleFile.mv(uploadPath, function (err) {
+    if (err) {
+      return res.status(500).send(err);
     }
 
-    res.writeHead(200, {
-      "Content-Type": "application/json",
-    });
-    res.end(JSON.stringify({ status: "success", path: "/tmp" + image.name }));
+    res.send("File uploaded to " + uploadPath);
   });
 });

@@ -75,7 +75,4 @@ const deleteUser = (request, response) => {
 module.exports = {
   getQuotes,
   getRandomQuote,
-  createUser,
-  updateUser,
-  deleteUser,
 };
